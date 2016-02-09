@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import BDBOAuth1Manager
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,7 +19,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         return true
     }
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        TwitterClient.sharedInstance.fetchAccessTokenWithPath("oauth/access_token", method: "POST", requestToken: BDBOAuth1Credential (queryString:url.query), success: { (accessToken: BDBOAuth1Credential!) -> Void in
+            print("Got the access token")
+            TwitterClient.sharedInstance.requestSerializer.saveAccessToken(accessToken)
+            
+            TwitterClient.sharedInstance.GET("/1.1/account/verify_credentials.json", parameters: nil, success: { (operation: NSURLSessionDataTask!, response: AnyObject?) -> Void in
+                print("current user: \(response)")
+                }, failure: { (operation: NSURLSessionDataTask?, error: NSError!) -> Void in
+                    print("error getting current user")
+            })
+            TwitterClient.sharedInstance.GET("", parameters: nil, success: { (operation: NSURLSessionDataTask, response: AnyObject?) -> Void in
+                print("home timeline: \(response)")
+                }, failure: { (operation: NSURLSessionDataTask?, error: NSError!) -> Void in
+                    print("error getting home page")
+            })
+            
+            
+            }) { (error: NSError!) -> Void in
+                print("Failed to receive acces token")
+        }
+        return true
+    }
 
+    
+    
     func applicationWillResignActive(application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
