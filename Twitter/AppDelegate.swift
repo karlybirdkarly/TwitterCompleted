@@ -13,33 +13,31 @@ import BDBOAuth1Manager
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var storyboard = UIStoryboard(name: "Main", bundle: nil)
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
-        return true
-    }
-    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
-        TwitterClient.sharedInstance.fetchAccessTokenWithPath("oauth/access_token", method: "POST", requestToken: BDBOAuth1Credential (queryString:url.query), success: { (accessToken: BDBOAuth1Credential!) -> Void in
-            print("Got the access token")
-            TwitterClient.sharedInstance.requestSerializer.saveAccessToken(accessToken)
-            
-            TwitterClient.sharedInstance.GET("/1.1/account/verify_credentials.json", parameters: nil, success: { (operation: NSURLSessionDataTask!, response: AnyObject?) -> Void in
-                print("current user: \(response)")
-                }, failure: { (operation: NSURLSessionDataTask?, error: NSError!) -> Void in
-                    print("error getting current user")
-            })
-            TwitterClient.sharedInstance.GET("", parameters: nil, success: { (operation: NSURLSessionDataTask, response: AnyObject?) -> Void in
-                print("home timeline: \(response)")
-                }, failure: { (operation: NSURLSessionDataTask?, error: NSError!) -> Void in
-                    print("error getting home page")
-            })
-            
-            
-            }) { (error: NSError!) -> Void in
-                print("Failed to receive acces token")
+       
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "userDidLogout", name: userDidLogoutNotification, object: nil)
+        
+        if User.currentUser != nil {
+            //Go to the logged screen
+            print("Current user detected: \(User.currentUser!.name)")
+            let vc = storyboard.instantiateViewControllerWithIdentifier("TabBar")
+            window?.rootViewController = vc
+        } else {
+            print("Failed to detect current user")
         }
         return true
+    }
+    
+    func userDidLogout() {
+        let vc = storyboard.instantiateInitialViewController()
+        window?.rootViewController = vc
+    }
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        TwitterClient.sharedInstance.openUrl(url)
+        return true
+
     }
 
     
