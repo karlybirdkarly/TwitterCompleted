@@ -1,4 +1,4 @@
-# Project 5 - *Name of App Here*
+# Project 5 - *Twitter*
 
 Time spent: **20** hours spent in total
 
