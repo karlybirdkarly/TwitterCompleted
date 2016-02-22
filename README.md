@@ -1,6 +1,6 @@
 # Project 5 - *Twitter*
 
-Time spent: **20** hours spent in total
+Time spent: **30** hours spent in total
 
 ## User Stories
 
@@ -46,7 +46,6 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
 I struggled with twitter api int general, but now it makes more sense to me. I spent a lot of time just to understand implementation.
 
 ## License
